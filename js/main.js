@@ -17,7 +17,7 @@ let circles = (() => {
 
     let holding = null;
 
-    let precision, helper, line, picker;
+    let precision, helper, line, picker, len;
 
     function main() {
         c = document.getElementById("canvas");
@@ -33,6 +33,7 @@ let circles = (() => {
         helper = document.getElementById("helper");
         line = document.getElementById("line");
         picker = document.getElementById("picker");
+        len = document.getElementById("length");
 
         let undo = () => {
             if (undoQueue.length > 0) {
@@ -44,6 +45,9 @@ let circles = (() => {
                     case "movePoint":
                         points[action.id].x = action.from.x;
                         points[action.id].y = action.from.y;
+                        break;
+                    case "removePoint":
+                        points.splice(action.id, 0, action.point);
                         break;
                 }
                 redoQueue.push(action);
@@ -60,6 +64,9 @@ let circles = (() => {
                     case "movePoint":
                         points[action.id].x = action.to.x;
                         points[action.id].y = action.to.y;
+                        break;
+                    case "removePoint":
+                        points.splice(action.id, 1);
                         break;
                 }
             }
@@ -82,6 +89,22 @@ let circles = (() => {
                     break;
                 case "x":
                     clear();
+                    break;
+                case "r":
+                    let closestDist = Infinity;
+                    let closest = null;
+                    for (let i in points) {
+                        let dist = points[i].sub(mouse).mag();
+                        if (dist < closestDist) {
+                            closestDist = dist;
+                            closest = i;
+                        }
+                    }
+
+                    if (closestDist < MIN_EDIT_DIST / c.width) {
+                        undoQueue.push({ action: "removePoint", point: points[closest], id: closest });
+                        points.splice(closest, 1);
+                    }
                     break;
             }
         });
@@ -188,11 +211,10 @@ let circles = (() => {
                 };
             });
 
-            let f = norm.frequency * 16777215;
-            let r = norm.radius * 16777215;
-            let o = norm.offset * 16777215;
-
-            let gearData = `${minF.toFixed(0)};${minR.toFixed(3)};${minO.toFixed(3)};${maxF.toFixed(0)};${maxR.toFixed(3)};${maxO.toFixed(3)};${picker.dataset.value};` + normalized.map(norm => {
+            let gearData = `${minF.toFixed(0)};${minR.toFixed(3)};${minO.toFixed(3)};${maxF.toFixed(0)};${maxR.toFixed(3)};${maxO.toFixed(3)};${picker.dataset.value};${len.value};` + normalized.map(norm => {
+                let f = norm.frequency * 16777215;
+                let r = norm.radius * 16777215;
+                let o = norm.offset * 16777215;
                 return BASE64[f >> 18] + BASE64[f >> 12 & 63] + BASE64[f >> 6 & 63] + BASE64[f & 63] +
                        BASE64[r >> 18] + BASE64[r >> 12 & 63] + BASE64[r >> 6 & 63] + BASE64[r & 63] +
                        BASE64[o >> 18] + BASE64[o >> 12 & 63] + BASE64[o >> 6 & 63] + BASE64[o & 63]
@@ -215,12 +237,12 @@ let circles = (() => {
         p.id = points.length;
         if (click) {
             points.push(p);
-            undoQueue.push({ action: "addPoint", point: new Vec(p) });
+            undoQueue.push({ action: "addPoint", point: p });
             redoQueue = [];
         } else if (mousedown) {
             if (points[points.length - 1].sub(mouse).mag() > precision.value / c.width) {
                 points.push(p);
-                undoQueue.push({ action: "addPoint", point: new Vec(p) });
+                undoQueue.push({ action: "addPoint", point: p });
                 redoQueue = [];
             }
         }
@@ -238,6 +260,7 @@ let circles = (() => {
     function render() {
         ctx.clearRect(0, 0, c.width, c.height);
 
+        ctx.lineCap = "butt";
         ctx.strokeStyle = picker.dataset.value;
         ctx.lineWidth = 5;
         ctx.beginPath();

@@ -6,6 +6,7 @@ let circles = (() => {
     let gears = [];
     let path = [];
     let color;
+    let len;
 
     function main() {
         c = document.getElementById("canvas");
@@ -26,6 +27,7 @@ let circles = (() => {
         let [minF, minR, minO, maxF, maxR, maxO] = data.slice(0, -1).map(x => parseFloat(x));
 
         color = data[6];
+        len = parseInt(data[7]);
 
         let gearData = data[data.length - 1];
         for (let i = 0; i < gearData.length; i += 12) {
@@ -49,8 +51,8 @@ let circles = (() => {
         let y = 0;
 
         for (let gear of gears) {
-            let dx = Math.cos(time / 1000 * gear.frequency * 2 * Math.PI + gear.offset) * gear.radius;
-            let dy = Math.sin(time / 1000 * gear.frequency * 2 * Math.PI + gear.offset) * gear.radius;
+            let dx = Math.cos(time / 1000 / len * gear.frequency * 2 * Math.PI + gear.offset) * gear.radius;
+            let dy = Math.sin(time / 1000 / len * gear.frequency * 2 * Math.PI + gear.offset) * gear.radius;
 
             ctx.beginPath();
             ctx.arc((x + 0.5) * c.width, (y + 0.5) * c.height, gear.radius * c.width, 0, 2 * Math.PI);
@@ -64,8 +66,19 @@ let circles = (() => {
 
         path.push({
             x: x,
-            y: y
+            y: y,
+            time: time
         });
+
+        let limit = 0;
+        for (let i = 0; i < path.length; i++) {
+            if (time - path[i].time > len * 1200) {
+                limit = i;
+            } else {
+                break;
+            }
+        }
+        path.splice(0, limit);
 
         ctx.save();
         ctx.lineWidth = 5;

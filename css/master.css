@@ -24,6 +24,11 @@ input[type=button] {
     margin: 0.1em;
 }
 
+input[type=number] {
+    position: relative;
+    top: -0.2em;
+}
+
 input[type=checkbox] {
     font-size: 30px;
     position: relative;
@@ -50,4 +55,8 @@ input[type=button]:active {
 
 .output {
     text-align: left;
+}
+
+.length {
+    width: 3em;
 }
