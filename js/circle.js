@@ -41,7 +41,7 @@ let circles = (() => {
             });
         }
 
-        render(0);
+        requestAnimationFrame(render);
     }
 
     function render(time) {
