@@ -42,7 +42,7 @@ let circles = (() => {
             });
         }
         startTime = Date.now();
-        render();
+        setInterval(render, 16);
     }
 
     function render() {
