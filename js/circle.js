@@ -7,6 +7,7 @@ let circles = (() => {
     let path = [];
     let color;
     let len;
+    let startTime;
 
     function main() {
         c = document.getElementById("canvas");
@@ -40,11 +41,12 @@ let circles = (() => {
                 offset: offset
             });
         }
-
-        requestAnimationFrame(render);
+        startTime = Date.now();
+        render();
     }
 
-    function render(time) {
+    function render() {
+        let time = Date.now() - startTime;
         ctx.lineCap = "butt";
         ctx.clearRect(0, 0, c.width, c.height);
         let x = 0;
