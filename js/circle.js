@@ -7,7 +7,8 @@ let circles = (() => {
     let path = [];
     let color;
     let len;
-    let startTime;
+    let lastTime;
+    let time;
 
     function main() {
         c = document.getElementById("canvas");
@@ -41,12 +42,13 @@ let circles = (() => {
                 offset: offset
             });
         }
-        startTime = Date.now();
-        setInterval(render, 16);
+        lastTime = Date.now();
+        time = 0;
+        render();
     }
 
     function render() {
-        let time = Date.now() - startTime;
+        time += Math.min(Date.now() - lastTime, 20);
         ctx.lineCap = "butt";
         ctx.clearRect(0, 0, c.width, c.height);
         let x = 0;
