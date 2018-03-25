@@ -116,8 +116,8 @@ let circles = (() => {
         mouse = new Vec(0, 0);
         c.addEventListener("mousemove", e => {
             let rect = c.getBoundingClientRect();
-            mouse.x = (e.clientX - rect.x) / c.width;
-            mouse.y = (e.clientY - rect.y) / c.height;
+            mouse.x = (e.pageX - rect.x) / c.width;
+            mouse.y = (e.pageY - rect.y) / c.height;
         });
 
         c.oncontextmenu = e => {
@@ -125,6 +125,27 @@ let circles = (() => {
             e.stopPropagation();
         };
 
+        c.addEventListener("touchstart", e => {
+            mousedown = true;
+            click = true;
+        });
+        
+        c.addEventListener("touchend", e => {
+            mousedown = false;
+        });
+        
+        c.addEventListener("touchmove", e => {
+            let t = null;
+            for (let touch of e.changedTouches) {
+                if (touch.identifier == 0) {
+                    t = touch;
+                    break;
+                }
+            }
+            mouse.x = (t.pageX - rect.x) / c.width;
+            mouse.y = (t.pageY - rect.y) / c.height;
+        });
+        
         c.addEventListener("mousedown", e => {
             switch (e.button) {
                 case 0:
