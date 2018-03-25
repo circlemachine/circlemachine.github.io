@@ -142,6 +142,9 @@ let circles = (() => {
                     break;
                 }
             }
+            if (t == null)
+                return;
+            let rect = c.getBoundingClientRect();
             mouse.x = (t.pageX - rect.x) / c.width;
             mouse.y = (t.pageY - rect.y) / c.height;
         });
