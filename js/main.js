@@ -113,7 +113,7 @@ let circles = (() => {
         document.getElementById("redo").onclick = redo;
         document.getElementById("clear").onclick = clear;
 
-        mouse = new Vec(0, 0);
+        mouse = new Vec(-1, -1);
         c.addEventListener("mousemove", e => {
             let rect = c.getBoundingClientRect();
             mouse.x = (e.pageX - rect.x) / c.width;
@@ -259,15 +259,17 @@ let circles = (() => {
     function update() {
         let p = new Vec(mouse);
         p.id = points.length;
-        if (click) {
-            points.push(p);
-            undoQueue.push({ action: "addPoint", point: p });
-            redoQueue = [];
-        } else if (mousedown) {
-            if (points[points.length - 1].sub(mouse).mag() > precision.value / c.width) {
+        if (mouse.x != -1) {
+            if (click) {
                 points.push(p);
                 undoQueue.push({ action: "addPoint", point: p });
                 redoQueue = [];
+            } else if (mousedown) {
+                if (points[points.length - 1].sub(mouse).mag() > precision.value / c.width) {
+                    points.push(p);
+                    undoQueue.push({ action: "addPoint", point: p });
+                    redoQueue = [];
+                }
             }
         }
 
